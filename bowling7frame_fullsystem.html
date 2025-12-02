@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>7-Frame Bowling Score – Full System</title>
+<style>
+    body { font-family: Arial; padding: 20px; max-width: 1000px; margin: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table, th, td { border: 1px solid #444; text-align: center; padding: 6px; }
+    input { width: 40px; text-align: center; }
+    .playerBox { border: 2px solid #333; padding: 15px; margin-top: 20px; border-radius: 10px; background: #f9f9f9; }
+    .title { font-size: 20px; font-weight: bold; }
+    button { padding: 10px 15px; cursor: pointer; margin-right: 10px; }
+    #ranking { margin-top: 20px; padding: 15px; border: 2px solid green; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<h2>🎳 FULL Bowling Score System – 7 Frames</h2>
+
+<button onclick="addPlayer()">+ Add Player</button>
+<button onclick="calculateRanking()">Update Ranking</button>
+
+<div id="players"></div>
+
+<h2>🏆 Ranking</h2>
+<div id="ranking">Belum ada ranking.</div>
+
+<script>
+let playerCount = 0;
+let players = [];
+
+function addPlayer() {
+    playerCount++;
+    players.push({ id: playerCount, total: 0 });
+
+    const container = document.getElementById("players");
+
+    let html = `
+    <div class="playerBox" id="player_${playerCount}">
+        <div class="title">Player ${playerCount}</div>
+        <table>
+            <tr>
+                <th>Frame</th><th>Roll 1</th><th>Roll 2</th><th>Score</th>
+            </tr>`;
+
+    for (let i = 1; i <= 7; i++) {
+        html += `
+            <tr>
+                <td>${i}</td>
+                <td><input type="number" min="0" max="10" id="p${playerCount}_r1_${i}" oninput="calculate(${playerCount})"></td>
+                <td><input type="number" min="0" max="10" id="p${playerCount}_r2_${i}" oninput="calculate(${playerCount})"></td>
+                <td id="p${playerCount}_score_${i}">0</td>
+            </tr>`;
+    }
+
+    html += `
+        </table>
+        <div class="title">Total Score: <span id="p${playerCount}_total">0</span></div>
+    </div>`;
+
+    container.insertAdjacentHTML("beforeend", html);
+}
+
+function calculate(player) {
+    let total = 0;
+
+    for (let i = 1; i <= 7; i++) {
+        let r1 = parseInt(document.getElementById(`p${player}_r1_${i}`).value) || 0;
+        let r2 = parseInt(document.getElementById(`p${player}_r2_${i}`).value) || 0;
+
+        let score = r1 + r2;
+        document.getElementById(`p${player}_score_${i}`).textContent = score;
+        total += score;
+    }
+
+    document.getElementById(`p${player}_total`).textContent = total;
+    players.find(p => p.id === player).total = total;
+}
+
+function calculateRanking() {
+    players.sort((a, b) => b.total - a.total);
+
+    let html = "<ol>";
+    for (let p of players) {
+        html += `<li>Player ${p.id} — ${p.total} pts</li>`;
+    }
+    html += "</ol>";
+
+    document.getElementById("ranking").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
